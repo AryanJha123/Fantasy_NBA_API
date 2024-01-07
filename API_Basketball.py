@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime, timedelta
 import time
+import statistics
 
 # Fantasy points (change for custom leagues)
 FGM = 2 # Field goal made
@@ -78,9 +79,12 @@ target_games = int(input('How many games do you want to look at?'))
 
 # Use the API to get the stats and fantasy points
 fpts = 0
+total_fpts = 0
 game_count = 0
 days = 0
 player_fpts = []
+player_total_fpts = []
+temp_fpts = []
 
 url = "https://www.balldontlie.io/api/v1/stats"
 for i in player_ids:
@@ -99,29 +103,50 @@ for i in player_ids:
                 if response_json['data'][0]['min'] != '00':
                     game_count += 1
                     fgm, fga, ftm, fta, tpm, reb, ast, stl, blk, to, pts = extract_stats(response_json)
-                    fpts += fantasy_pt_calculator(fgm, fga, ftm, fta, tpm, reb, ast, stl, blk, to, pts)
+                    fpts = fantasy_pt_calculator(fgm, fga, ftm, fta, tpm, reb, ast, stl, blk, to, pts)
+                    temp_fpts.append(fpts)
+                    total_fpts += fpts
         except:
             time.sleep(1)
             pass
         days += 1
-    player_fpts.append(fpts)
+    player_fpts.append(temp_fpts)
+    player_total_fpts.append(total_fpts)
+    temp_fpts = []
     days = 0
     game_count = 0
     fpts = 0
+    total_fpts = 0
 
 # Sort the players from highest points to lowest points.
-sorted_descending = sorted(range(len(player_fpts)), key=lambda k: player_fpts[k], reverse = True)
+sorted_descending = sorted(range(len(player_fpts)), key=lambda k: player_total_fpts[k], reverse = True)
 sorted_fpts = []
 sorted_players = []
 for i in sorted_descending:
-    sorted_fpts.append(player_fpts[i])
+    sorted_fpts.append(player_total_fpts[i])
     sorted_players.append(players[i])
 
-# Output the points for each player (total & average)
+# Calculate median for each player.
+med_fpts = []
+for i in range(len(player_fpts)):
+    med_fpts.append(statistics.median(player_fpts[i]))
+
+# Sort medians by highest to lowest.
+sorted_med_fpts = []
+sorted_med_players = []
+sorted_med_descending = sorted(range(len(player_fpts)), key=lambda k: med_fpts[k], reverse = True)
+for i in sorted_med_descending:
+    sorted_med_fpts.append(med_fpts[i])
+    sorted_med_players.append(players[i])
+
 print('Total fantasy points over the last', target_games, 'games.')
 for i in range(len(sorted_players)):
     print(sorted_players[i] + ':', sorted_fpts[i])
 
-print('\nAverage fantasy points over the last', target_games, 'games.')
+print('\nMean fantasy points over the last', target_games, 'games.')
 for i in range(len(sorted_players)):
     print(sorted_players[i] + ':', sorted_fpts[i]/target_games)
+    
+print('\nMedian fantasy points over the last', target_games, 'games.')
+for i in range(len(sorted_players)):
+    print(sorted_med_players[i] + ':', sorted_med_fpts[i])

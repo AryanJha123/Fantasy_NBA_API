@@ -14,4 +14,4 @@ If you don't want to do that, then you can run the program and input the player 
 NOTE: the player names must be spelt correctly or else an error will occur. <br>
 Then, you can enter the amount of games you want to look at. For example, if you enter 5, then the program will look at the last 5 games for each player. <br>
 The program will collect the stats for each player and use the point values provided earlier to calculate the fantasy points for each player. This step might take a while due to the 60 calls/minute limitation of the balldontlie API. <br>
-Finally, it displays the total fantasy points and average fantasy points for each player. <br>
+Finally, it displays the total, mean, and median fantasy points for each player. <br>

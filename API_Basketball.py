@@ -49,11 +49,13 @@ def extract_stats(response_json):
     pts = int(response_json['data'][0]['pts'])
     return fgm, fga, ftm, fta, tpm, reb, ast, stl, blk, to, pts
 
-inputting = True
-
 # Players of interest:
+# If you want to hard-code the player names, you can edit the list of players with their names.
 players = []
 player_ids = []
+
+# If you are hard-coding the names, set this to False.
+inputting = True
 
 while inputting:
     inp_player = input('Enter the name of a player you would like to look at. Press enter again when done.')
@@ -107,11 +109,19 @@ for i in player_ids:
     game_count = 0
     fpts = 0
 
+# Sort the players from highest points to lowest points.
+sorted_descending = sorted(range(len(player_fpts)), key=lambda k: player_fpts[k], reverse = True)
+sorted_fpts = []
+sorted_players = []
+for i in sorted_descending:
+    sorted_fpts.append(player_fpts[i])
+    sorted_players.append(players[i])
+
 # Output the points for each player (total & average)
-print('\nTotal fantasy points over the last', target_games, 'games.')
-for i in range(len(players)):
-    print(players[i] + ':', player_fpts[i])
+print('Total fantasy points over the last', target_games, 'games.')
+for i in range(len(sorted_players)):
+    print(sorted_players[i] + ':', sorted_fpts[i])
 
 print('\nAverage fantasy points over the last', target_games, 'games.')
-for i in range(len(players)):
-    print(players[i] + ':', player_fpts[i]/target_games)
+for i in range(len(sorted_players)):
+    print(sorted_players[i] + ':', sorted_fpts[i]/target_games)
